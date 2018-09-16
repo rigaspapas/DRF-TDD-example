@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "drf-tdd-example"
+version = "0.1.0"
+description = "An example Django REST framework project for test driven development"
+authors = ["Erdem Ozkol"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "*"
+coverage = "=4.4.1"
+Django = "=2.1.1"
+django-nose = "=1.4.5"
+djangorestframework = "=3.8.2"
+nose = "=1.3.7"
+
+[tool.poetry.dev-dependencies]
+black = "^18.3-alpha.0"
+flake8 = "^3.5"
