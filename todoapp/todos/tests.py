@@ -15,12 +15,14 @@ class TodoListCreateAPIViewTestCase(APITestCase):
         self.username = "john"
         self.email = "john@snow.com"
         self.password = "you_know_nothing"
-        self.user = User.objects.create_user(self.username, self.email, self.password)
+        self.user = User.objects.create_user(
+            self.username, self.email, self.password
+        )
         self.token = Token.objects.create(user=self.user)
         self.api_authentication()
 
     def api_authentication(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
     def test_create_todo(self):
         response = self.client.post(self.url, {"name": "Clean the room!"})
@@ -32,23 +34,26 @@ class TodoListCreateAPIViewTestCase(APITestCase):
         """
         Todo.objects.create(user=self.user, name="Clean the car!")
         response = self.client.get(self.url)
-        self.assertTrue(len(json.loads(response.content)) == Todo.objects.count())
+        self.assertTrue(
+            len(json.loads(response.content)) == Todo.objects.count()
+        )
 
 
 class TodoDetailAPIViewTestCase(APITestCase):
-
     def setUp(self):
         self.username = "john"
         self.email = "john@snow.com"
         self.password = "you_know_nothing"
-        self.user = User.objects.create_user(self.username, self.email, self.password)
+        self.user = User.objects.create_user(
+            self.username, self.email, self.password
+        )
         self.todo = Todo.objects.create(user=self.user, name="Call Mom!")
         self.url = reverse("todos:detail", kwargs={"pk": self.todo.pk})
         self.token = Token.objects.create(user=self.user)
         self.api_authentication()
 
     def api_authentication(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
     def test_todo_object_bundle(self):
         """
@@ -65,9 +70,11 @@ class TodoDetailAPIViewTestCase(APITestCase):
         """
             Test to verify that put call with different user token
         """
-        new_user = User.objects.create_user("newuser", "new@user.com", "newpass")
+        new_user = User.objects.create_user(
+            "newuser", "new@user.com", "newpass"
+        )
         new_token = Token.objects.create(user=new_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + new_token.key)
 
         # HTTP PUT
         response = self.client.put(self.url, {"name", "Hacked by new user"})
@@ -93,9 +100,11 @@ class TodoDetailAPIViewTestCase(APITestCase):
         """
             Test to verify that put call with different user token
         """
-        new_user = User.objects.create_user("newuser", "new@user.com", "newpass")
+        new_user = User.objects.create_user(
+            "newuser", "new@user.com", "newpass"
+        )
         new_token = Token.objects.create(user=new_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + new_token.key)
         response = self.client.delete(self.url)
         self.assertEqual(403, response.status_code)
 

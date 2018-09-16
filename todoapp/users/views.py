@@ -3,7 +3,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveDestroyAPIView
-from users.serializers import UserRegistrationSerializer, UserLoginSerializer, TokenSerializer
+from users.serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    TokenSerializer,
+)
 
 
 class UserRegistrationAPIView(CreateAPIView):
@@ -36,13 +40,11 @@ class UserLoginAPIView(GenericAPIView):
             user = serializer.user
             token, _ = Token.objects.get_or_create(user=user)
             return Response(
-                data=TokenSerializer(token).data,
-                status=status.HTTP_200_OK,
+                data=TokenSerializer(token).data, status=status.HTTP_200_OK
             )
         else:
             return Response(
-                data=serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
+                data=serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
 
@@ -58,10 +60,14 @@ class UserTokenAPIView(RetrieveDestroyAPIView):
             instance = Token.objects.get(key=request.auth.key)
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
-        return super(UserTokenAPIView, self).retrieve(request, pk, *args, **kwargs)
+        return super(UserTokenAPIView, self).retrieve(
+            request, pk, *args, **kwargs
+        )
 
     def destroy(self, request, pk, *args, **kwargs):
         if pk == "current":
             Token.objects.get(key=request.auth.key).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return super(UserTokenAPIView, self).destroy(request, pk, *args, **kwargs)
+        return super(UserTokenAPIView, self).destroy(
+            request, pk, *args, **kwargs
+        )
