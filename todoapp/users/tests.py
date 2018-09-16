@@ -83,8 +83,9 @@ class UserLoginAPIViewTestCase(APITestCase):
         self.assertTrue("auth_token" in json.loads(response.content))
 
 
-class UserLogoutAPIViewTestCase(APITestCase):
-    url = reverse("users:logout")
+class UserTokenAPIViewTestCase(APITestCase):
+    def url(self, pk):
+        return reverse("users:token", kwargs={"pk": pk})
 
     def setUp(self):
         self.username = "john"
@@ -94,10 +95,40 @@ class UserLogoutAPIViewTestCase(APITestCase):
         self.token = Token.objects.create(user=self.user)
         self.api_authentication()
 
+        self.user_2 = User.objects.create_user("mary", "mary@earth.com", "super_secret")
+        self.token_2 = Token.objects.create(user=self.user_2)
+
+    def tearDown(self):
+        self.user.delete()
+        self.token.delete()
+        self.user_2.delete()
+        self.token_2.delete()
+
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-    def test_logout(self):
-        response = self.client.post(self.url)
-        self.assertEqual(200, response.status_code)
-        self.assertFalse(Token.objects.filter(key=self.token).exists())
+    def test_delete_by_key(self):
+        response = self.client.delete(self.url(self.token.key))
+        self.assertEqual(204, response.status_code)
+        self.assertFalse(Token.objects.filter(key=self.token.key).exists())
+
+    def test_delete_current(self):
+        response = self.client.delete(self.url('current'))
+        self.assertEqual(204, response.status_code)
+        self.assertFalse(Token.objects.filter(key=self.token.key).exists())
+
+    def test_delete_unauthorized(self):
+        response = self.client.delete(self.url(self.token_2.key))
+        self.assertEqual(404, response.status_code)
+        self.assertTrue(Token.objects.filter(key=self.token_2.key).exists())
+
+    def test_get(self):
+        # Test that unauthorized access returns 404
+        response = self.client.get(self.url(self.token_2.key))
+        self.assertEqual(404, response.status_code)
+
+        for key in [self.token.key, 'current']:
+            response = self.client.get(self.url(key))
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(self.token.key, response.data['auth_token'])
+            self.assertIn('created', response.data)

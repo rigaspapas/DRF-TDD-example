@@ -52,4 +52,4 @@ class TokenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Token
-        fields = ("auth_token",)
+        fields = ("auth_token", "created")

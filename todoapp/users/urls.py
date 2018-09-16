@@ -1,10 +1,10 @@
-from django.conf.urls import url
-from users.views import UserRegistrationAPIView, UserLoginAPIView, UserLogoutAPIView
+from django.urls import path
+from users.views import UserRegistrationAPIView, UserLoginAPIView, UserTokenAPIView
 
 app_name = 'users'
 
 urlpatterns = [
-    url(r'^$', UserRegistrationAPIView.as_view(), name="list"),
-    url(r'^login/$', UserLoginAPIView.as_view(), name="login"),
-    url(r'^logout/$', UserLogoutAPIView.as_view(), name="logout"),
+    path(r'users/', UserRegistrationAPIView.as_view(), name="list"),
+    path(r'users/login/', UserLoginAPIView.as_view(), name="login"),
+    path(r'tokens/<pk>/', UserTokenAPIView.as_view(), name="token"),
 ]
