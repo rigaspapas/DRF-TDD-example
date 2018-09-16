@@ -20,5 +20,3 @@ class TodoDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = TodoSerializer
     queryset = Todo.objects.all()
     permission_classes = (IsAuthenticated, UserIsOwnerTodo)
-
-

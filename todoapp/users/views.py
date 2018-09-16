@@ -3,7 +3,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from users.serializers import UserRegistrationSerializer, UserLoginSerializer, TokenSerializer
+from users.serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    TokenSerializer,
+)
 
 
 class UserRegistrationAPIView(CreateAPIView):
@@ -35,19 +39,12 @@ class UserLoginAPIView(GenericAPIView):
         if serializer.is_valid():
             user = serializer.user
             token, _ = Token.objects.get_or_create(user=user)
-            return Response(
-                data=TokenSerializer(token).data,
-                status=status.HTTP_200_OK,
-            )
+            return Response(data=TokenSerializer(token).data, status=status.HTTP_200_OK)
         else:
-            return Response(
-                data=serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogoutAPIView(APIView):
-
     def post(self, request, *args, **kwargs):
         Token.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_200_OK)
